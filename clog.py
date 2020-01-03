@@ -1,4 +1,3 @@
-import argparse
 import mailbox
 import csv
 import timeit
