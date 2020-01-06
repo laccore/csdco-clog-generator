@@ -43,21 +43,29 @@ def process_mbox(mbox_filename, year=None, verbose=False):
           message['Subject'],
           message['From'],
           message['To'],
-          a_date.format('M/D/YY H:mm')
+          a_date
         ]
-        
+
         emails.append(data)
 
     if verbose and (count%1000 == 0):
       print(f'INFO: {count} emails processed.')
-  
+
+  # Sort based on arrow object
+  emails = sorted(emails, key=lambda x: x[-1])
+
+  # Convert list in-place to desired string format
+  date_format = 'M/D/YY H:mm'
+  emails = [[*email[:-1], email[-1].format(date_format)] for email in emails]
+
   return [emails, count, ignored]
+
 
 def export_emails(emails, output_filename):
   with open(output_filename, 'w') as out_file:
     writer = csv.writer(out_file, quoting=csv.QUOTE_MINIMAL)
-    
     writer.writerows(emails)
+
 
 @Gooey(program_name='CSDCO CLOG Generator')
 def main():
@@ -79,7 +87,6 @@ def main():
   # Process data
   print(f'Beginning processing of {mailbox_filename}...')
   emails, message_count, ignored_count = process_mbox(mailbox_filename, args.year, args.verbose)
-  print(emails)
 
   # Export data
   print(f'Beginning export of data to {output_filename}...')
