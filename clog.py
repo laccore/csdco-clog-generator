@@ -1,34 +1,79 @@
 import mailbox
 import csv
 import timeit
+# from datetime import datetime
+import arrow
 from gooey import Gooey, GooeyParser
 
-def export_mbox(mbox_filename, output_filename):
+def process_mbox(mbox_filename, year=None, verbose=False):
+  count = 0
+  ignored = 0
+  emails = []
+
+  for message in mailbox.mbox(mbox_filename):
+    count += 1
+    
+    date_formats = [
+      r'ddd,[\s+]D[\s+]MMM[\s+]YYYY[\s+]H:mm:ss[\s+]Z',
+      r'D[\s+]MMM[\s+]YYYY[\s+]HH:mm:ss[\s+]Z',
+      r'ddd,[\s+]D[\s+]MMM[\s+]YYYY[\s+]H:mm:ss[\s+]ZZZ'
+    ]
+
+    a_date = None
+
+    for d_format in date_formats:
+      try:
+        a_date = arrow.get(message['Date'], d_format)
+        break
+      except:
+        continue
+    
+    if not a_date:
+      print(f"ALERT: '{message['Date']}' does not match any expected format. Ignoring email with subject '{message['Subject']}'")
+      ignored += 1
+    else:
+      # if year:
+      if year and (a_date.format('YYYY') != year):
+        ignored += 1
+        if verbose:
+          print(f"WARNING: Invalid year found ({a_date.format('YYYY')}).")
+
+      else:
+        data = [
+          message['Subject'],
+          message['From'],
+          message['To'],
+          a_date
+        ]
+
+        emails.append(data)
+
+    if verbose and (count%1000 == 0):
+      print(f'INFO: {count} emails processed.')
+
+  # Sort based on arrow object
+  emails = sorted(emails, key=lambda x: x[-1])
+
+  # Convert list in-place to desired string format
+  date_format = 'M/D/YY H:mm'
+  emails = [[*email[:-1], email[-1].format(date_format)] for email in emails]
+
+  return [emails, count, ignored]
+
+
+def export_emails(emails, output_filename):
   with open(output_filename, 'w') as out_file:
     writer = csv.writer(out_file, quoting=csv.QUOTE_MINIMAL)
+    writer.writerows(emails)
 
-    count = 0
-    for message in mailbox.mbox(mbox_filename):
-      count += 1
-      data = [
-        message['subject'],
-        message['from'],
-        message['to'],
-        message['date']
-      ]
-
-      writer.writerow(data)
-
-      if (count%100 == 0):
-        print(f'\t{count} emails processed')
-
-  return count
 
 @Gooey(program_name='CSDCO CLOG Generator')
 def main():
   parser = GooeyParser(description='Export data (Subject, From, To, Date) from a .mbox file to a CSV')
   parser.add_argument('mbox', metavar='.mbox file', widget='FileChooser', type=str, help='Name of mbox file')
   parser.add_argument('-o', '--output-filename', metavar='Output filename', type=str, help='Filename for export.')
+  parser.add_argument('-y', '--year', metavar='Year', type=str, help='Ignore emails not from this year.')
+  parser.add_argument('-v', '--verbose', metavar='Verbose', action='store_true', help='Print troubleshooting information.')
   args = parser.parse_args()
 
   start_time = timeit.default_timer()
@@ -39,12 +84,15 @@ def main():
   else:
     output_filename = mailbox_filename.replace('.mbox', '.csv')
 
+  # Process data
+  print(f'Beginning processing of {mailbox_filename}...')
+  emails, message_count, ignored_count = process_mbox(mailbox_filename, args.year, args.verbose)
+
   # Export data
-  print(f'Beginning export of {mailbox_filename} to {output_filename}...')
+  print(f'Beginning export of data to {output_filename}...')
+  export_emails(emails, output_filename)
 
-  message_count = export_mbox(mailbox_filename, output_filename)
-
-  print(f'{message_count} emails were found and exported to {output_filename}.')
+  print(f'{message_count} emails were found and {message_count - ignored_count} were exported to {output_filename}.')
   print(f'Completed in {round((timeit.default_timer()-start_time), 2)} seconds.')
 
 
