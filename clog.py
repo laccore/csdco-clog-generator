@@ -13,6 +13,8 @@ def process_mbox(mbox_filename, year=None, verbose=False):
   for message in mailbox.mbox(mbox_filename):
     count += 1
     
+    # When downloading from Google Takeout, there are a few different datetime formats
+    # So far, they've all matched one of the below options (with lots of regex for extra whitespace...)
     date_formats = [
       r'ddd,[\s+]D[\s+]MMM[\s+]YYYY[\s+]H:mm:ss[\s+]Z',
       r'D[\s+]MMM[\s+]YYYY[\s+]HH:mm:ss[\s+]Z',
@@ -32,7 +34,6 @@ def process_mbox(mbox_filename, year=None, verbose=False):
       print(f"ALERT: '{message['Date']}' does not match any expected format. Ignoring email with subject '{message['Subject']}'")
       ignored += 1
     else:
-      # if year:
       if year and (a_date.format('YYYY') != year):
         ignored += 1
         if verbose:
