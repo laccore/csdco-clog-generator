@@ -32,20 +32,21 @@ def process_mbox(mbox_filename, year=None, verbose=False):
       print(f"ALERT: '{message['Date']}' does not match any expected format. Ignoring email with subject '{message['Subject']}'")
       ignored += 1
     else:
-      if year:
-        if (a_date.format('YYYY') == year):
-          data = [
-            message['Subject'],
-            message['From'],
-            message['To'],
-            a_date.format('M/D/YY H:mm')
-          ]
+      # if year:
+      if year and (a_date.format('YYYY') != year):
+        ignored += 1
+        if verbose:
+          print(f"WARNING: Invalid year found ({a_date.format('YYYY')}).")
 
-          emails.append(data)
-        else:
-          ignored += 1
-          if verbose:
-            print(f"WARNING: Invalid year found ({a_date.format('YYYY')}).")
+      else:
+        data = [
+          message['Subject'],
+          message['From'],
+          message['To'],
+          a_date.format('M/D/YY H:mm')
+        ]
+        
+        emails.append(data)
 
     if verbose and (count%1000 == 0):
       print(f'INFO: {count} emails processed.')
@@ -78,6 +79,7 @@ def main():
   # Process data
   print(f'Beginning processing of {mailbox_filename}...')
   emails, message_count, ignored_count = process_mbox(mailbox_filename, args.year, args.verbose)
+  print(emails)
 
   # Export data
   print(f'Beginning export of data to {output_filename}...')
