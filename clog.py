@@ -1,7 +1,6 @@
 import mailbox
 import csv
 import timeit
-# from datetime import datetime
 import arrow
 from gooey import Gooey, GooeyParser
 
@@ -17,8 +16,8 @@ def process_mbox(mbox_filename, year=None, verbose=False):
     # So far, they've all matched one of the below options (with lots of regex for extra whitespace...)
     date_formats = [
       r'ddd,[\s+]D[\s+]MMM[\s+]YYYY[\s+]H:mm:ss[\s+]Z',
-      r'D[\s+]MMM[\s+]YYYY[\s+]HH:mm:ss[\s+]Z',
       r'ddd,[\s+]D[\s+]MMM[\s+]YYYY[\s+]H:mm:ss[\s+]ZZZ'
+      r'D[\s+]MMM[\s+]YYYY[\s+]HH:mm:ss[\s+]Z',
     ]
 
     a_date = None
@@ -33,6 +32,7 @@ def process_mbox(mbox_filename, year=None, verbose=False):
     if not a_date:
       print(f"ALERT: '{message['Date']}' does not match any expected format. Ignoring email with subject '{message['Subject']}'")
       ignored += 1
+
     else:
       if year and (a_date.format('YYYY') != year):
         ignored += 1
@@ -55,7 +55,7 @@ def process_mbox(mbox_filename, year=None, verbose=False):
   # Sort based on arrow object
   emails = sorted(emails, key=lambda x: x[-1])
 
-  # Convert list in-place to desired string format
+  # Convert list to desired string format
   date_format = 'M/D/YY H:mm'
   emails = [[*email[:-1], email[-1].format(date_format)] for email in emails]
 
