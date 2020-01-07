@@ -64,8 +64,8 @@ def process_mbox(mbox_filename, year=None, verbose=False):
 
 
 def export_emails(emails, output_filename):
-  with open(output_filename, 'w') as out_file:
-    writer = csv.writer(out_file, newline='', quoting=csv.QUOTE_MINIMAL)
+  with open(output_filename, 'w', newline='') as out_file:
+    writer = csv.writer(out_file, quoting=csv.QUOTE_MINIMAL)
     writer.writerows(emails)
 
 
