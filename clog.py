@@ -3,6 +3,13 @@ import csv
 import timeit
 import arrow
 from gooey import Gooey, GooeyParser
+from email.header import decode_header, make_header
+import locale
+import re
+
+
+def clean_header(header):
+  return str(make_header(decode_header(re.sub(r'\s\s+', ' ', header)))) if header else ''
 
 
 def process_mbox(mbox_filename, year=None, verbose=False):
@@ -33,7 +40,7 @@ def process_mbox(mbox_filename, year=None, verbose=False):
         continue
     
     if not a_date:
-      print(f"ALERT: '{message['Date']}' does not match any expected format. Ignoring email with subject '{message['Subject']}'")
+      print(f"ALERT: '{message['Date']}' does not match any expected format. Ignoring email with subject '{message['Subject']}'.")
       ignored += 1
 
     else:
@@ -44,9 +51,9 @@ def process_mbox(mbox_filename, year=None, verbose=False):
       
       else:
         data = [
-          message['Subject'],
-          message['From'],
-          message['To'],
+          clean_header(message['Subject']),
+          clean_header(message['From']),
+          clean_header(message['To']),
           a_date
         ]
 
@@ -66,7 +73,7 @@ def process_mbox(mbox_filename, year=None, verbose=False):
 
 
 def export_emails(emails, output_filename):
-  with open(output_filename, 'w', newline='') as out_file:
+  with open(output_filename, 'w', newline='', encoding=locale.getpreferredencoding()) as out_file:
     writer = csv.writer(out_file, quoting=csv.QUOTE_MINIMAL)
     writer.writerows(emails)
 
