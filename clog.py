@@ -4,6 +4,7 @@ import timeit
 import arrow
 from gooey import Gooey, GooeyParser
 
+
 def process_mbox(mbox_filename, year=None, verbose=False):
   count = 0
   ignored = 0
@@ -17,7 +18,7 @@ def process_mbox(mbox_filename, year=None, verbose=False):
     date_formats = [
       r'ddd,[\s+]D[\s+]MMM[\s+]YYYY[\s+]H:mm:ss[\s+]Z',
       r'ddd,[\s+]D[\s+]MMM[\s+]YYYY[\s+]H:mm:ss[\s+]ZZZ'
-      r'D[\s+]MMM[\s+]YYYY[\s+]HH:mm:ss[\s+]Z',
+      r'D[\s+]MMM[\s+]YYYY[\s+]HH:mm:ss[\s+]Z'
     ]
 
     a_date = None
@@ -56,7 +57,7 @@ def process_mbox(mbox_filename, year=None, verbose=False):
   emails = sorted(emails, key=lambda x: x[-1])
 
   # Convert list to desired string format
-  date_format = 'M/D/YY H:mm'
+  date_format = 'M/D/YY'
   emails = [[*email[:-1], email[-1].format(date_format)] for email in emails]
 
   return [emails, count, ignored]
@@ -64,7 +65,7 @@ def process_mbox(mbox_filename, year=None, verbose=False):
 
 def export_emails(emails, output_filename):
   with open(output_filename, 'w') as out_file:
-    writer = csv.writer(out_file, quoting=csv.QUOTE_MINIMAL)
+    writer = csv.writer(out_file, newline='', quoting=csv.QUOTE_MINIMAL)
     writer.writerows(emails)
 
 
