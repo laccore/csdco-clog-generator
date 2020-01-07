@@ -17,7 +17,9 @@ def process_mbox(mbox_filename, year=None, verbose=False):
     # So far, they've all matched one of the below options (with lots of regex for extra whitespace...)
     date_formats = [
       r'ddd,[\s+]D[\s+]MMM[\s+]YYYY[\s+]H:mm:ss[\s+]Z',
-      r'ddd,[\s+]D[\s+]MMM[\s+]YYYY[\s+]H:mm:ss[\s+]ZZZ'
+      r'ddd,[\s+]D[\s+]MMM[\s+]YYYY[\s+]H:mm:ss[\s+]ZZZ',
+      r'ddd,[\s+]D[\s+]MMM[\s+]YYYY[\s+]H:mm:ss[\s+]',
+      r'ddd[\s+]D[\s+]MMM[\s+]YYYY[\s+]H:mm:ss[\s+]Z',
       r'D[\s+]MMM[\s+]YYYY[\s+]HH:mm:ss[\s+]Z'
     ]
 
@@ -39,7 +41,7 @@ def process_mbox(mbox_filename, year=None, verbose=False):
         ignored += 1
         if verbose:
           print(f"WARNING: Invalid year found ({a_date.format('YYYY')}).")
-
+      
       else:
         data = [
           message['Subject'],
