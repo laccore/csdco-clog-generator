@@ -6,16 +6,23 @@ from gooey import Gooey, GooeyParser
 from email.header import decode_header, make_header
 import locale
 import re
+import os.path
 
 
-def clean_header(header):
-  return str(make_header(decode_header(re.sub(r'\s\s+', ' ', header)))) if header else ''
+def clean_header(header, verbose=False):
+  try:
+    return str(make_header(decode_header(re.sub(r'\s\s+', ' ', header)))) if header else ''
+  except:
+    return header
 
 
 def process_mbox(mbox_filename, year=None, verbose=False):
   count = 0
   ignored = 0
   emails = []
+
+  if verbose and year:
+    print(f'Ignoring emails not from year {year}.')
 
   for message in mailbox.mbox(mbox_filename):
     count += 1
@@ -26,6 +33,7 @@ def process_mbox(mbox_filename, year=None, verbose=False):
       r'ddd,[\s+]D[\s+]MMM[\s+]YYYY[\s+]H:mm:ss[\s+]Z',
       r'ddd,[\s+]D[\s+]MMM[\s+]YYYY[\s+]H:mm:ss[\s+]ZZZ',
       r'ddd,[\s+]D[\s+]MMM[\s+]YYYY[\s+]H:mm:ss[\s+]',
+      r'ddd,[\s+]DD[\s+]MMM[\s+]YYYY[\s+]HH:mm:ss',
       r'ddd[\s+]D[\s+]MMM[\s+]YYYY[\s+]H:mm:ss[\s+]Z',
       r'D[\s+]MMM[\s+]YYYY[\s+]HH:mm:ss[\s+]Z'
     ]
@@ -91,7 +99,12 @@ def main():
 
   mailbox_filename = args.mbox
   if 'output_filename' in args and args.output_filename:
-    output_filename = args.output_filename
+    if not os.path.exists(args.output_filename):
+      if args.verbose:
+        print(f"Invalid path name for export given. Changed to {mailbox_filename.replace('.mbox', '.csv')}")
+      output_filename = mailbox_filename.replace('.mbox', '.csv')
+    else:
+      output_filename = args.output_filename
   else:
     output_filename = mailbox_filename.replace('.mbox', '.csv')
 
@@ -100,7 +113,7 @@ def main():
   emails, message_count, ignored_count = process_mbox(mailbox_filename, args.year, args.verbose)
 
   # Export data
-  print(f'Beginning export of data to {output_filename}...')
+  print(f'Beginning export of {len(emails)} emails to {output_filename}...')
   export_emails(emails, output_filename)
 
   print(f'{message_count} emails were found and {message_count - ignored_count} were exported to {output_filename}.')
