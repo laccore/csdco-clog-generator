@@ -90,7 +90,7 @@ def export_emails(emails, output_filename):
 def main():
   parser = GooeyParser(description='Export data (Subject, From, To, Date) from a .mbox file to a CSV')
   parser.add_argument('mbox', metavar='.mbox file', widget='FileChooser', type=str, help='Name of mbox file')
-  parser.add_argument('-o', '--output-filename', metavar='Output filename', type=str, help='Filename for export.')
+  # parser.add_argument('-o', '--output-filename', metavar='Output filename', type=str, help='Filename for export.')
   parser.add_argument('-y', '--year', metavar='Year', type=str, help='Ignore emails not from this year.')
   parser.add_argument('-v', '--verbose', metavar='Verbose', action='store_true', help='Print troubleshooting information.')
   args = parser.parse_args()
@@ -98,15 +98,15 @@ def main():
   start_time = timeit.default_timer()
 
   mailbox_filename = args.mbox
-  if 'output_filename' in args and args.output_filename:
-    if not os.path.exists(args.output_filename):
-      if args.verbose:
-        print(f"Invalid path name for export given. Changed to {mailbox_filename.replace('.mbox', '.csv')}")
-      output_filename = mailbox_filename.replace('.mbox', '.csv')
-    else:
-      output_filename = args.output_filename
-  else:
-    output_filename = mailbox_filename.replace('.mbox', '.csv')
+  # if 'output_filename' in args and args.output_filename:
+  #   if not os.path.exists(args.output_filename):
+  #     if args.verbose:
+  #       print(f"Invalid path name for export given. Changed to {mailbox_filename.replace('.mbox', '.csv')}")
+  #     output_filename = mailbox_filename.replace('.mbox', '.csv')
+  #   else:
+  #     output_filename = args.output_filename
+  # else:
+  output_filename = mailbox_filename.replace('.mbox', '.csv')
 
   # Process data
   print(f'Beginning processing of {mailbox_filename}...')
