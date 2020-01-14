@@ -17,6 +17,9 @@ def clean_header(header, verbose=False):
             else ""
         )
     except:
+        if verbose:
+            print(f"Failed to properly decode/reencode header:")
+            print(header)
         return header
 
 
@@ -65,9 +68,9 @@ def process_mbox(mbox_filename, year=None, verbose=False):
 
             else:
                 data = [
-                    clean_header(message["Subject"]),
-                    clean_header(message["From"]),
-                    clean_header(message["To"]),
+                    clean_header(message["Subject"], verbose),
+                    clean_header(message["From"], verbose),
+                    clean_header(message["To"], verbose),
                     a_date,
                 ]
 
