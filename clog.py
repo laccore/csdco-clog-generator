@@ -1,6 +1,5 @@
 import csv
 import datetime
-import locale
 import mailbox
 import os.path
 import re
@@ -94,9 +93,7 @@ def process_mbox(mbox_filename, year=None, verbose=False):
 
 
 def export_emails(emails, output_filename):
-    with open(
-        output_filename, "w", newline="", encoding=locale.getpreferredencoding()
-    ) as out_file:
+    with open(output_filename, "w", newline="", encoding="utf-8") as out_file:
         writer = csv.writer(out_file, quoting=csv.QUOTE_MINIMAL)
         writer.writerows(emails)
 
