@@ -1,5 +1,7 @@
 build/
 dist/
-2019.*
+env/
+test/
+Gooey/
 *.mbox
 *.csv

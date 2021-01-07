@@ -43,6 +43,8 @@ def process_mbox(mbox_filename, year=None, verbose=False):
             r"ddd,[\s+]DD[\s+]MMM[\s+]YYYY[\s+]HH:mm:ss",
             r"ddd[\s+]D[\s+]MMM[\s+]YYYY[\s+]H:mm:ss[\s+]Z",
             r"D[\s+]MMM[\s+]YYYY[\s+]HH:mm:ss[\s+]Z",
+            r"ddd,[\s+]D[\s+]MMM[\s+]YYYY[\s+]H:mm[\s+]Z",
+            r"MM/D/YY,[\s+]H[\s+]mm[.*]",
         ]
 
         a_date = None
@@ -109,36 +111,25 @@ def main():
         type=str,
         help="Name of mbox file",
     )
-    # parser.add_argument('-o', '--output-filename', metavar='Output filename', type=str, help='Filename for export.')
     parser.add_argument(
         "-y",
         "--year",
         metavar="Year",
         type=str,
-        help="Ignore emails not from this year.",
+        help="Ignore emails not from this year",
     )
     parser.add_argument(
         "-v",
         "--verbose",
         metavar="Verbose",
         action="store_true",
-        help="Print troubleshooting information.",
+        help="Print troubleshooting information",
     )
     args = parser.parse_args()
 
     start_time = timeit.default_timer()
 
     mailbox_filename = args.mbox
-    # if "output_filename" in args and args.output_filename:
-    #     if not os.path.exists(args.output_filename):
-    #         if args.verbose:
-    #             print(
-    #                 f"Invalid path name for export given. Changed to {mailbox_filename.replace('.mbox', '.csv')}"
-    #             )
-    #         output_filename = mailbox_filename.replace(".mbox", ".csv")
-    #     else:
-    #         output_filename = args.output_filename
-    # else:
     output_filename = mailbox_filename.replace(".mbox", ".csv")
 
     # Process data
