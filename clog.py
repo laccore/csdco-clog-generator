@@ -1,12 +1,14 @@
-import mailbox
 import csv
+import datetime
+import locale
+import mailbox
+import os.path
+import re
 import timeit
+from email.header import decode_header, make_header
+
 import arrow
 from gooey import Gooey, GooeyParser
-from email.header import decode_header, make_header
-import locale
-import re
-import os.path
 
 
 def clean_header(header, verbose=False):
@@ -112,11 +114,10 @@ def main():
         help="Name of mbox file",
     )
     parser.add_argument(
-        "-y",
-        "--year",
+        "year",
         metavar="Year",
-        type=str,
         help="Ignore emails not from this year",
+        default=datetime.datetime.now().year - 1,
     )
     parser.add_argument(
         "-v",
