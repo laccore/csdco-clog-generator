@@ -59,7 +59,7 @@ def process_mbox(mbox_filename, year=None, verbose=False):
 
         if not a_date:
             print(
-                f"ALERT: '{message['Date']}' does not match any expected format. Ignoring email with subject '{message['Subject']}'."
+                f"ALERT: '{message['Date']}' does not match any expected format. Excluding email with subject '{message['Subject']}'."
             )
             ignored += 1
 
@@ -113,7 +113,7 @@ def main():
     parser.add_argument(
         "year",
         metavar="Year",
-        help="Ignore emails not from this year",
+        help="Exclude emails not from this year",
         default=datetime.datetime.now().year - 1,
     )
     parser.add_argument(
