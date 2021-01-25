@@ -30,7 +30,7 @@ def process_mbox(mbox_filename, year=None, verbose=False):
     emails = []
 
     if verbose and year:
-        print(f"Ignoring emails not from year {year}.")
+        print(f"Excluding emails not from year {year}.")
 
     for message in mailbox.mbox(mbox_filename):
         count += 1
@@ -67,7 +67,7 @@ def process_mbox(mbox_filename, year=None, verbose=False):
             if year and (a_date.format("YYYY") != year):
                 ignored += 1
                 if verbose:
-                    print(f"WARNING: Invalid year found ({a_date.format('YYYY')}).")
+                    print(f"INFO: Invalid year found ({a_date.format('YYYY')}).")
 
             else:
                 data = [
